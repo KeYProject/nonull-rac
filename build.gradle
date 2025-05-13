@@ -1,7 +1,12 @@
 plugins {
     id 'java-library'
     id 'com.github.johnrengelman.shadow' version '8.1.1'
+    id 'maven-publish'
 }
+
+description = 'A Java agent for runtime non-null checks'
+version = "0.1.0-SNAPSHOT"
+group = 'io.github.wadoon'
 
 repositories {
     mavenCentral()
@@ -9,17 +14,81 @@ repositories {
 
 dependencies {
     implementation("org.ow2.asm:asm:9.8")
+    implementation("org.jspecify:jspecify:1.0.0")
     testImplementation("junit:junit:4.13.2")
 }
 
-task runtimeJar (type: Jar) {
+
+/*task runtimeJar (type: Jar) {
     from sourceSets.main.output
     include "nonnull/**"
     archiveFileName = "nonnull-runtime.jar"
+}*/
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+    withSourcesJar()
+    withJavadocJar()    
+}
+
+javadoc {
+    options.encoding = 'UTF-8'
+    options.addStringOption('Xdoclint:none', '-quiet')
+    failOnError = false
 }
 
 jar {
      manifest {
          attributes "Premain-Class": "de.matul.nonnull.NonNullAgent"
      }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java            
+
+            pom {                
+                name = 'nonnull-rac'
+                url = 'https://github.com/wadoon/nonull-rac'
+                licenses {
+                    license {
+                        name = 'GPL-2.0-or-later'
+                        url = 'https://opensource.org/licenses/GPL-3.0'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'ulbrich'
+                        name = 'Matthias Ulbrich'
+                        email = 'ulbrich@kit.edu'
+                    }
+
+                    developer {
+                        id = 'wadoon'
+                        name = 'Alexander Weigl'
+                        email = 'weigl@kit.edu'
+                    }
+                }
+                issueManagement {
+                    system = 'GitHub'
+                    url = ''
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/wadoon/nonull-rac.git'
+                    developerConnection = 'scm:git:ssh://github.com:wadoon/nonull-rac.git'
+                    url = 'https://github.com/wadoon/nonull-rac'
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name = "local"
+            url = uri("$buildDir/repo")
+        }
+    }
 }
