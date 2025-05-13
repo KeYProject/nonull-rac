@@ -27,9 +27,3 @@ jobs:
 
       - name: Build shadow JAR
         run: ./gradlew shadowJar
-
-      - name: Upload shadow JAR artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: shadow-jar
-          path: build/libs/*-all.jar
