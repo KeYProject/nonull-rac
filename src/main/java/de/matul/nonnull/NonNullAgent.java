@@ -48,6 +48,7 @@ public class NonNullAgent {
      *            the instrumentation to operate on.
      */
     public static void premain(String arg, Instrumentation instr) {
+        System.out.println("test");
         if(arg == null) {
              throw new IllegalArgumentException("You need to provide a class prefix");
         }
